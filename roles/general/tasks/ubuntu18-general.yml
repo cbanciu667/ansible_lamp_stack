@@ -1,0 +1,53 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: yes
+
+- name: update all packages
+  apt:
+    upgrade: dist
+
+- name: Add universe repo
+  command: add-apt-repository universe
+
+- name: update apt cache
+  apt:
+    update_cache: yes
+
+- name: install some general packages
+  apt:
+    name: "{{ general_packages }}"
+
+- name: "Create User"
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    group: sudo
+  with_items: "{{ users }}"
+
+- name: "Set authorized key took from file"
+  authorized_key:
+    user: "{{ item.username }}"
+    state: present
+    key: "{{ lookup('file', '../files/{{item.username}}.pub') }}"
+    exclusive: yes
+  with_items: "{{ users }}"
+
+- name: "Remove authorized key for the users in removed_users list in vars/main.yml"
+  when: item.username is defined
+  authorized_key:
+    user: "{{ item.username }}"
+    state: absent
+    key: "{{ lookup('file', '../files/{{item.username}}.pub') }}"
+    exclusive: yes
+  with_items: "{{ removed_users }}"
+  ignore_errors: yes
+
+- name: "Remove the users from system"
+  when: item.username is defined
+  user:
+    name: "{{ item.username }}"
+    state: absent
+    remove: yes
+  with_items: "{{ removed_users }}"
+  ignore_errors: yes

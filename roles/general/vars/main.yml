@@ -1,0 +1,12 @@
+---
+users:
+  - username: user2
+removed_users:
+  - username: test
+general_packages:
+    - apt-transport-https
+    - software-properties-common
+    - python
+    - python-pip
+    - git
+    - openjdk-11-jre-headless

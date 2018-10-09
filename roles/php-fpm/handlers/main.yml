@@ -1,0 +1,15 @@
+---
+- name: reload php
+  systemd:
+    name: php7.2-fpm
+    state: reloaded
+
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded

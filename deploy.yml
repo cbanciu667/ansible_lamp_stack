@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  roles:
+    - general
+    - nginx
+    - php-fpm
+    - mysql
+  gather_facts: False
+  pre_tasks:
+    - raw: apt-get clean && apt-get update && apt-get -y install python

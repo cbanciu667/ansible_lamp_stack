@@ -1,0 +1,80 @@
+---
+- name: Create www-data group
+  group:
+    name: www-data
+    state: present
+
+- name: Create www-data user
+  user:
+    name: www-data
+    groups:
+      - www-data
+      - sudo
+    comment: "Nginx User"
+    system: yes
+    state: present
+    home: /opt/app/myapp
+    createhome: yes
+    move_home: yes
+
+- name: Install nginx for Ubuntu 18
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  notify: start nginx
+
+- name: Create ssl directory on Ubuntu 18
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Copy crt for nginx to Ubuntu 18
+  copy:
+    src: certificate.crt
+    dest: /etc/nginx/ssl/certificate.crt
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nginx
+
+- name: Copy dhparams.pem for nginx to Ubuntu 18
+  copy:
+    src: dhparams.pem
+    dest: /etc/nginx/ssl/dhparams.pem
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nginx
+
+- name: Copy key for nginx to Ubuntu 18
+  copy:
+    src: key.key
+    dest: /etc/nginx/ssl/key.key
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nginx
+
+- name: Copy nginx configuration
+  copy:
+    src: default
+    dest: /etc/nginx/sites-available/default
+  notify: reload nginx
+
+- name: Copy nginx.conf configuration
+  copy:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - reload nginx
+    - restart nginx
+
+- name: Enable nginx at startup
+  systemd:
+    name: nginx
+    enabled: yes
+    masked: no

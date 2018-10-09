@@ -1,0 +1,36 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install php packages
+  apt:
+    name: "{{ php_packages }}"
+
+- name: Copy php.ini configuration
+  copy:
+    src: php.ini
+    dest: /etc/php/7.2/fpm/php.ini
+
+- name: Remove default index file
+  command: rm -f /var/www/html/index.nginx-debian.html
+
+- name: Copy php.info
+  copy:
+    src: php.info
+    dest: /var/www/html/phpinfo.php
+
+- name: Copy index.php
+  copy:
+    src: index.php
+    dest: /var/www/html/index.php
+  notify:
+    - reload php
+    - reload nginx
+    - restart nginx
+
+- name: Enable php7.2 at startup
+  systemd:
+    name: php7.2-fpm
+    enabled: yes
+    masked: no

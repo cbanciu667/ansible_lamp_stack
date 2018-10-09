@@ -1,0 +1,2 @@
+[aws-lamp]
+18.19.20.21 ansible_connection=ssh        ansible_user=debian     ansible_ssh_common_args='-o StrictHostKeyChecking=no'
